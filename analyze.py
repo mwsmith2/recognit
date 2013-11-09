@@ -1,114 +1,87 @@
-# import scientific libraries
+"""analyze.py: Contains functions for Principal Component Analysis (PCA)."""
+
+__author__ = "Durmus U. Karatay, Matthias W. Smith"
+__email__ = "ukaratay@uw.edu, mwsmith2@uw.edu"
+
 import numpy as np
-import scipy.linalg as la
+import random
+import load
 
 
-# Need to write a function to open PGM files first and foremost
-def read_pgm(filename):
-	
-	f = open(filename)
-	pgm_id = f.readline() # This is the pgm identifier - P2
+def createMatrices(filename, sd=1234, ratio=0.6):
+    """
+    Creates matrices for training and test.
 
-	if pgm_id[:2] == 'P2':
+    Parameters
+    ----------
+    filename : path
 
-		img = decode_plain_pgm(f)
-		f.close()
-		return img
+            Path to .txt file that includes list of PGM images.
 
-	elif pgm_id[:2] == 'P5':
+    sd : int
 
-		img = decode_raw_pgm(f)
-		f.close()
-		return img
+            Seed for random set generation. The default is 1234.
 
-	else:
+    ratio : float
 
-		print "Not a valid PGM file!"
-		return -1
+            Ratio of images in training set to total number. Default is 0.6.
 
+    Returns
+    -------
+    XTrain : array_like
 
-# A function to decode plain pgms
-def decode_plain_pgm(f):
+            Matrix of PGM images. Every column corresponds to an image.
 
-	line = f.readline().split() # This line contains the width and height
-	width  = int(line[0])
-	height = int(line[1])
+    XTest : array_like
 
-	line = f.readline().split() # It contains the maxval which we don't need.
+            Matrix of PGM images. Every column corresponds to an image.
 
-	img = np.zeros([height, width], dtype='int16')
-	n = 0
+    """
 
-	while (n < height):
+    with open(filename) as f:
 
-		vals = []
+        filelist = f.readlines()
 
-		while (len(vals) < width and len(line) != 0):
+    nimages = len(filelist)
 
-			line = f.readline().split()
+    random.seed(sd)
+    trainlist = random.sample(filelist, int(nimages * ratio))
+    testlist = [x for x in filelist if x not in trainlist]
 
-			for x in line:
-			
-				vals.append(np.int(x))
+    for i in range(len(trainlist)):
 
-		img[n] = np.array(vals)
-		n += 1
+        if i == 0:
 
-	return img
+            image = load.readPGM(trainlist(i))
 
+            width = image.shape[0]
+            height = image.shape[1]
 
-# A function to decode raw pgms
-def decode_raw_pgm(f):
+            XTrain = np.empty((width * height, len(trainlist)))
 
-	line = f.readline().split() # This line contains the width and height
-	width  = int(line[0])
-	height = int(line[1])
+            XTrain[:, i] = image.reshape(-1)
 
-	line = f.readline().split() # This line contains the max value
-	maxval = int(line[0])
+        else:
 
-	if maxval < 256:
-		pixel_size = 1 # bytes
-	else:
-		pixel_size = 2
+            image = load.readPGM(trainlist(i))
+            XTrain[:, i] = image.reshape(-1)
 
-	img = np.zeros([height, width], dtype='int16')
-	n = 0
+    for j in range(len(testlist)):
 
-	while (n < height):
+        if j == 0:
 
-		buff = bytearray(f.read(width * pixel_size))
+            image = load.readPGM(testlist(j))
 
-		for i in range(width):
-			
-			img[n][i] = int(buff[pixel_size * i])
-			
-			if pixel_size == 2:
-			
-				img[n][i] += 2**8 * int(buff[pixel_size * i  + 1])
+            width = image.shape[0]
+            height = image.shape[1]
 
-		n += 1
+            XTest = np.empty((width * height, len(testlist)))
 
-	return img
+            XTest[:, j] = image.reshape(-1)
 
+        else:
 
-# The first analyzer function, principal component analysis
-def PCA(X, Y, k=10):
+            image = load.readPGM(testlist(j))
+            XTest[:, j] = image.reshape(-1)
 
-	w, v = la.eig(np.dot(X, np.transpose(X))) # BUG - not sure of order
-
-	big_eigs = np.empty([k, 2])
-	eig_vecs = np.empty([k, v.shape[0]])
-
-	for i in range(k):
-
-		idx = np.argsort(w)[i]
-		big_eigs[i, 0] = idx
-		big_eigs[i, 1] = w[idx]
-		eig_vecs[i] = v[:, idx]
-
-	return big_eigs[:,0], eig_vecs
-
-
-
-
+    return XTrain, XTest
