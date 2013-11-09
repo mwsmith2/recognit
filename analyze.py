@@ -4,6 +4,8 @@ __author__ = "Durmus U. Karatay, Matthias W. Smith"
 __email__ = "ukaratay@uw.edu, mwsmith2@uw.edu"
 
 import numpy as np
+import os
+import sys
 import random
 import load
 
@@ -38,9 +40,12 @@ def createMatrices(filename, sd=1234, ratio=0.6):
 
     """
 
+    datadir = os.path.dirname(os.path.abspath(filename))
+
     with open(filename) as f:
 
         filelist = f.readlines()
+
 
     nimages = len(filelist)
 
@@ -52,7 +57,7 @@ def createMatrices(filename, sd=1234, ratio=0.6):
 
         if i == 0:
 
-            image = load.readPGM(trainlist(i))
+            image = load.readPGM(datadir + '/' + trainlist[i].rstrip('\n'))
 
             width = image.shape[0]
             height = image.shape[1]
@@ -63,14 +68,14 @@ def createMatrices(filename, sd=1234, ratio=0.6):
 
         else:
 
-            image = load.readPGM(trainlist(i))
+            image = load.readPGM(datadir + '/' + trainlist[i].rstrip('\n'))
             XTrain[:, i] = image.reshape(-1)
 
     for j in range(len(testlist)):
 
         if j == 0:
 
-            image = load.readPGM(testlist(j))
+            image = load.readPGM(datadir + '/' + testlist[j].rstrip('\n'))
 
             width = image.shape[0]
             height = image.shape[1]
@@ -81,7 +86,7 @@ def createMatrices(filename, sd=1234, ratio=0.6):
 
         else:
 
-            image = load.readPGM(testlist(j))
+            image = load.readPGM(datadir + '/' + testlist[j].rstrip('\n'))
             XTest[:, j] = image.reshape(-1)
 
     return XTrain, XTest
