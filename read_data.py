@@ -5,14 +5,14 @@ import matplotlib.pyplot as plt
 
 import analyze
 
-filename = 'data/cheyer/cheyer_up_neutral_open.pgm'
+filename = 'faces/cheyer_up_neutral_open.pgm'
 
 img1 = analyze.read_pgm(filename)
 plt.contour(img1)
 plt.savefig('fig/image1.pdf')
 plt.close()
 
-filename = 'data/cheyer/cheyer_left_angry_open_2.pgm'
+filename = 'faces/cheyer_left_angry_open_2.pgm'
 
 img2 = analyze.read_pgm(filename)
 plt.contour(img2)
