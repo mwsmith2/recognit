@@ -4,7 +4,7 @@ __author__ = "Durmus U. Karatay, Matthias W. Smith"
 __email__ = "ukaratay@uw.edu, mwsmith2@uw.edu"
 
 import numpy as np
-import scipy.linalg as la
+import scipy.linalg as spl
 import os
 import random
 import load
@@ -92,8 +92,8 @@ def createMatrices(filename, sd=1234, ratio=0.6):
     return XTrain, XTest
 
 
-def PCA(X, n=10):
-    """ Take a matrices and determine the first n principal components.
+def calculateEig(X, n=10):
+    """ Take a matrix and determine the first n principal components.
 
     Parameters
     ==========
@@ -107,24 +107,21 @@ def PCA(X, n=10):
 
     """
 
-    # Our data needs to be centered
+    # Our data needs to be centered.
     for i in range(X.shape[1]):
 
-        X[:, i] -= np.mean(X[:, i])
+        X[:, i] -= X[:, i].mean()
 
-    # Get eigenvalues and vectors of cov(X_transpose) in ascending order
-    lamb0, evec0 = la.eigh(np.dot(np.transpose(X), X))
+    # Get eigenvalues and vectors of cov(X_transpose) in ascending order.
+    eigval, eigvec = spl.eigh(np.dot(X.T, X))
 
-    # Convert these to eigenvalues of the cov(X)
-    lamb = lamb0 / np.mean(lamb0)
-    evec = np.dot(evec0, np.transpose(X))
-    for i in range(evec.shape[0]):
-        evec[i] = evec[i] / np.mean(evec[i])
+    # Convert these to eigenvalues of the cov(X).
+    eigval = eigval / eigval.mean()
+    eigvec = np.dot(eigvec, X.T)
 
-    print lamb.shape
-    print lamb
-    print evec.shape
-    print evec
+    for i in range(eigvec.shape[0]):
 
-    # Return the largest n eigenvalues/vectors
-    return lamb[-n:], evec[-n:]
+        eigvec[i] = eigvec[i] / spl.norm(eigvec[i])
+
+    # Return the largest n eigenvalues and vectors.
+    return eigval[-n:], eigvec[-n:]
