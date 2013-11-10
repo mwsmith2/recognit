@@ -142,7 +142,6 @@ def characterizeFaces(XTrain, trainlist):
     eignorm = eigval.cumsum() / eigval.sum()
 
     neig = np.abs(eignorm - 0.90).argmin()
-
     weightDict = {}
 
     for name in nameDict:
@@ -155,7 +154,27 @@ def characterizeFaces(XTrain, trainlist):
 
         weightDict[name] = weightList / len(nameDict[name])
 
-    return weightDict
+    return weightDict, eigvec[:neig]
+
+
+def calcWeight(image, eigvec):
+
+    weight = np.dot(image, eigvec.T)
+
+    return weight
+
+
+def guessWho(weightDict, weight):
+
+    proximity = {}
+
+    for name in weightDict:
+
+        proximity[name] = spl.norm(weightDict[name] - weight)
+
+    person = min(proximity, key=proximity.get)
+
+    return person
 
 
 def createDict(filelist):
