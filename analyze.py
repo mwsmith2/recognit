@@ -4,8 +4,8 @@ __author__ = "Durmus U. Karatay, Matthias W. Smith"
 __email__ = "ukaratay@uw.edu, mwsmith2@uw.edu"
 
 import numpy as np
+import scipy.linalg as la
 import os
-import sys
 import random
 import load
 
@@ -90,3 +90,41 @@ def createMatrices(filename, sd=1234, ratio=0.6):
             XTest[:, j] = image.reshape(-1)
 
     return XTrain, XTest
+
+
+def PCA(X, n=10):
+    """ Take a matrices and determine the first n principal components.
+
+    Parameters
+    ==========
+    X : array_like
+
+            The matrix which we will decompose into eigenvectors.
+
+    n : int
+
+            The number of eigenvectors to be returned.
+
+    """
+
+    # Our data needs to be centered
+    for i in range(X.shape[1]):
+
+        X[:, i] -= np.mean(X[:, i])
+
+    # Get eigenvalues and vectors of cov(X_transpose) in ascending order
+    lamb0, evec0 = la.eigh(np.dot(np.transpose(X), X))
+
+    # Convert these to eigenvalues of the cov(X)
+    lamb = lamb0 / np.mean(lamb0)
+    evec = np.dot(evec0, np.transpose(X))
+    for i in range(evec.shape[0]):
+        evec[i] = evec[i] / np.mean(evec[i])
+
+    print lamb.shape
+    print lamb
+    print evec.shape
+    print evec
+
+    # Return the largest n eigenvalues/vectors
+    return lamb[-n:], evec[-n:]
