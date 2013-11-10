@@ -4,7 +4,7 @@ __author__ = "Durmus U. Karatay, Matthias W. Smith"
 __email__ = "ukaratay@uw.edu, mwsmith2@uw.edu"
 
 import numpy as np
-
+from matplotlib.image import imread
 
 def readPGM(filename):
     """
@@ -36,8 +36,9 @@ def readPGM(filename):
 
     elif pgmID[:2] == 'P5':
 
-        image = decodeP5(f)
         f.close()
+        image = decodeP5(filename)
+
 
         return image
 
@@ -90,51 +91,24 @@ def decodeP2(f):
     return image
 
 
-def decodeP5(f):
+def decodeP5(filename):
     """
     Decode P5 type PGM files.
 
     Parameters
     ----------
-    f : file handler
+    filename : filename
 
-            Handler of .pgm file.
+            Filename of P5 type file.
 
     Returns
     -------
     image : array_like
 
-            PGM file returned as numpy.ndarray with type int8 or int 16.
+            PGM file returned as numpy.ndarray.
 
     """
 
-    line = f.readline().split()  # This line contains the width and height.
-    width = int(line[0])
-    height = int(line[1])
-
-    line = f.readline().split()  # This line contains the max value.
-    maxval = int(line[0])
-
-    if maxval < 256:
-
-        pixelsize = 1  # Number of bytes.
-        image = np.zeros([height, width], dtype='int8')
-
-    else:
-
-        pixelsize = 2
-        image = np.zeros([height, width], dtype='int16')
-
-    for n in range(height):
-
-        buff = bytearray(f.read(width * pixelsize))
-
-        for i in range(width):
-
-            image[n, i] = int(buff[pixelsize * i])
-
-            if pixelsize == 2:
-
-                image[n, i] += (2 ** 8) * int(buff[pixelsize * i + 1])
+    image = imread(filename)
 
     return image
