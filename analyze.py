@@ -5,96 +5,11 @@ __email__ = "ukaratay@uw.edu, mwsmith2@uw.edu"
 
 import numpy as np
 import scipy.linalg as spl
-import os
-import random
-import load
 from collections import defaultdict
 
 
-def createMatrices(filename, sd=1234, ratio=0.6):
-    """
-    Creates matrices for training and test.
-
-    Parameters
-    ----------
-    filename : path
-
-            Path to .txt file that includes list of PGM images.
-
-    sd : int
-
-            Seed for random set generation. The default is 1234.
-
-    ratio : float
-
-            Ratio of images in training set to total number. Default is 0.6.
-
-    Returns
-    -------
-    XTrain : array_like
-
-            Matrix of PGM images. Every column corresponds to an image.
-
-    XTest : array_like
-
-            Matrix of PGM images. Every column corresponds to an image.
-
-    """
-
-    datadir = os.path.dirname(os.path.abspath(filename))
-
-    with open(filename) as f:
-
-        filelist = f.readlines()
-
-
-    nimages = len(filelist)
-
-    random.seed(sd)
-    trainlist = random.sample(filelist, int(nimages * ratio))
-    testlist = [x for x in filelist if x not in trainlist]
-
-    for i in range(len(trainlist)):
-
-        if i == 0:
-
-            image = load.readPGM(datadir + '/' + trainlist[i].rstrip('\n'))
-
-            width = image.shape[0]
-            height = image.shape[1]
-
-            XTrain = np.empty((width * height, len(trainlist)))
-
-            XTrain[:, i] = image.reshape(-1)
-
-        else:
-
-            image = load.readPGM(datadir + '/' + trainlist[i].rstrip('\n'))
-            XTrain[:, i] = image.reshape(-1)
-
-    for j in range(len(testlist)):
-
-        if j == 0:
-
-            image = load.readPGM(datadir + '/' + testlist[j].rstrip('\n'))
-
-            width = image.shape[0]
-            height = image.shape[1]
-
-            XTest = np.empty((width * height, len(testlist)))
-
-            XTest[:, j] = image.reshape(-1)
-
-        else:
-
-            image = load.readPGM(datadir + '/' + testlist[j].rstrip('\n'))
-            XTest[:, j] = image.reshape(-1)
-
-    return XTrain, XTest, trainlist, testlist
-
-
 def calculateEig(X):
-    """ Take  matrix and determine the first n principal components.
+    """ Take matrix and determine eigenvectors and eigenvalues.
 
     Parameters
     ==========
@@ -134,55 +49,106 @@ def calculateEig(X):
     return eigval[::-1], eigvec[::-1]
 
 
-def characterizeFaces(XTrain, trainlist):
+def characterizeFaces(XTrain, trainlist, threshold=0.95):
+    """ Take matrix and determine the first n principal components.
+        Calculate weights for different features and match them with strings.
 
-    nameDict = createDict(trainlist)
-    eigval, eigvec = calculateEig(XTrain)
+    Parameters
+    ==========
+    XTrain : array_like
 
-    eignorm = eigval.cumsum() / eigval.sum()
+            The matrix which we will decompose into eigenvectors.
 
-    neig = np.abs(eignorm - 0.90).argmin()
+    trainlist : string_list
+
+            List of strings that contains names of features.
+
+    Returns
+    -------
+    weightDict : dict
+
+            Weights for each feature matched with the keyword.
+
+    eigvec : array_like
+
+            List of principal eigenvectors in ascending order.
+
+    """
+
+    featureDict = createDict(trainlist)  # Create a feature dictionary.
+    eigval, eigvec = calculateEig(XTrain)  # Calculate eigenvectors.
+
+    eignorm = eigval.cumsum() / eigval.sum()  # Normalize them.
+
+    neig = np.abs(eignorm - threshold).argmin()  # Select the principal ones.
     weightDict = {}
 
-    for name in nameDict:
+    # Calculate weights for every feature in the dictionary.
+    for feature in featureDict:
 
         weightList = np.zeros(neig)
 
-        for idx in nameDict[name]:
+        for idx in featureDict[feature]:
 
             weightList += np.dot(XTrain[:, idx], eigvec[:neig].T)
 
-        weightDict[name] = weightList / len(nameDict[name])
+        # Normalize weights.
+        weightDict[feature] = weightList / len(featureDict[feature])
 
     return weightDict, eigvec[:neig]
 
 
+def guessLabel(weightDict, weight):
+    """ Gets weight dictionary and weights for a single image and
+        guesses the label for asked feature.
+
+    Parameters
+    ==========
+    weightDict : dict
+
+            Weights for each feature matched with the keyword.
+
+    weight : array_like
+
+            Weights for given image.
+
+    Returns
+    -------
+    label : string
+
+            Guessed label for the feature.
+
+    distance : float
+
+            Distance to the closest feature.
+
+    """
+    distance = {}
+
+    for feature in weightDict:
+
+        distance[feature] = spl.norm(weightDict[feature] - weight)
+
+    label = min(distance, key=distance.get)
+
+    return label, distance[label]
+
+
 def calcWeight(image, eigvec):
+    """Calculate weights for a given image."""
 
     weight = np.dot(image, eigvec.T)
 
     return weight
 
 
-def guessWho(weightDict, weight):
-
-    proximity = {}
-
-    for name in weightDict:
-
-        proximity[name] = spl.norm(weightDict[name] - weight)
-
-    person = min(proximity, key=proximity.get)
-
-    return person
-
-
-def createDict(filelist):
+def createDict(filelist, n=0):
+    """Create a dictionary for feature given by n, using filenames."""
 
     nameDict = defaultdict(list)
 
     for i in range(len(filelist)):
 
-        nameDict[filelist[i].split('_')[0]].append(i)
+        nameDict[filelist[i].split('_')[n]].append(i)
 
     return nameDict
