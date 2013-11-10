@@ -8,6 +8,7 @@ import scipy.linalg as spl
 import os
 import random
 import load
+from collections import defaultdict
 
 
 def createMatrices(filename, sd=1234, ratio=0.6):
@@ -89,11 +90,11 @@ def createMatrices(filename, sd=1234, ratio=0.6):
             image = load.readPGM(datadir + '/' + testlist[j].rstrip('\n'))
             XTest[:, j] = image.reshape(-1)
 
-    return XTrain, XTest
+    return XTrain, XTest, trainlist, testlist
 
 
-def calculateEig(X, n=10):
-    """ Take a matrix and determine the first n principal components.
+def calculateEig(X):
+    """ Take  matrix and determine the first n principal components.
 
     Parameters
     ==========
@@ -101,9 +102,15 @@ def calculateEig(X, n=10):
 
             The matrix which we will decompose into eigenvectors.
 
-    n : int
+    Returns
+    -------
+    eigval : array_like
 
-            The number of eigenvectors to be returned.
+            List of eigenvalues in ascending order.
+
+    eigvec : array_like
+
+            List of eigenvectors in ascending order.
 
     """
 
@@ -124,4 +131,39 @@ def calculateEig(X, n=10):
         eigvec[i] = eigvec[i] / spl.norm(eigvec[i])
 
     # Return the largest n eigenvalues and vectors.
-    return eigval[-n:], eigvec[-n:]
+    return eigval[::-1], eigvec[::-1]
+
+
+def characterizeFaces(XTrain, trainlist):
+
+    nameDict = createDict(trainlist)
+    eigval, eigvec = calculateEig(XTrain)
+
+    eignorm = eigval.cumsum() / eigval.sum()
+
+    neig = np.abs(eignorm - 0.90).argmin()
+
+    weightDict = {}
+
+    for name in nameDict:
+
+        weightList = np.zeros(neig)
+
+        for idx in nameDict[name]:
+
+            weightList += np.dot(XTrain[:, idx], eigvec[:neig].T)
+
+        weightDict[name] = weightList / len(nameDict[name])
+
+    return weightDict
+
+
+def createDict(filelist):
+
+    nameDict = defaultdict(list)
+
+    for i in range(len(filelist)):
+
+        nameDict[filelist[i].split('_')[0]].append(i)
+
+    return nameDict
