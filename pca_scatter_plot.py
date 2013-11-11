@@ -50,10 +50,10 @@ print "fail = " + str(fail)
 
 #for imgname in trainlist:
 
-  #  image = load.readPGM('faces/' + imgname.rstrip('\n'))
-  #  weight = analyze.calcWeight(image.reshape(-1), eigvecs, meanface)
-  #  scatterDict[imgname.split('_')[0]].append(weight)
-  #  distanceDict[imgname.split('_')[0]].append(distance)
+#    image = load.readPGM('faces/' + imgname.rstrip('\n'))
+#    weight = analyze.calcWeight(image.reshape(-1), eigvecs, meanface)
+#    scatterDict[imgname.split('_')[0]].append(weight)
+#    distanceDict[imgname.split('_')[0]].append(distance)
 
 colors = cm.hsv(np.linspace(0, 1, len(scatterDict)))
 davg = np.mean(np.array(distanceDict.values()).reshape(-1)[0])
@@ -63,18 +63,20 @@ n2 = 1
 for name, color in zip(scatterDict, colors):
 
     w = np.array(scatterDict[name])
-    dist = 50 * np.exp(0.004*(np.array(distanceDict[name]) - davg))
+    dist = 50 * np.exp(0.008*(np.array(distanceDict[name]) - davg))
     plt.scatter(w[:,n1], w[:,n2], s=dist, c=color, alpha=0.5, label=name)
 
-    if name in weightDict:
-        wavg = weightDict[name]
-        plt.scatter(wavg[n1], wavg[n2], c=color, alpha=0.5, marker='d')
+#    if name in weightDict:
+#        wavg = weightDict[name]
+#        plt.scatter(wavg[n1], wavg[n2], c=color, alpha=0.5, marker='d')
 
-plt.title('Facial Characterization')
-plt.xlabel('Weight ' + str(n1 + 1))
+plt.rc('text', usetex=True)
+plt.rc('font', family='serif')
+
+plt.xlabel(r'$\omega_1$', fontsize=16)
 plt.tick_params(axis='x',labelbottom='off')
 plt.tick_params(axis='y',labelleft='off')
-plt.xlim(plt.xlim()[0], plt.xlim()[1] + 500)
-plt.ylabel('Weight ' + str(n2 + 1))
-plt.legend(loc=5, fontsize='x-small')
+plt.xlim(plt.xlim()[0], plt.xlim()[1] + 800)
+plt.ylabel(r'$\omega_2$', fontsize=16)
+plt.legend(loc=5, fontsize='small')
 plt.savefig('fig/scatter_by_name.pdf')
