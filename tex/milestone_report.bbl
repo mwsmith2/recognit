@@ -1,0 +1,15 @@
+\begin{thebibliography}{1}
+
+\bibitem{tur91}
+Matthew Turk and Alex Pentland.
+\newblock Eigenfaces for recognition.
+\newblock {\em Journal of Cognitive Neuroscience}, 3(1):71--86, Jan 1991.
+
+\bibitem{bel97}
+P.N. Belhumeur, J.P. Hespanha, and D.~Kriegman.
+\newblock Eigenfaces vs. fisherfaces: recognition using class specific linear
+  projection.
+\newblock {\em Pattern Analysis and Machine Intelligence, IEEE Transactions
+  on}, 19(7):711--720, 1997.
+
+\end{thebibliography}
