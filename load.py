@@ -153,7 +153,6 @@ def createMatrices(filename, sd=1234, ratio=0.6):
 
         filelist = f.readlines()
 
-
     nimages = len(filelist)
 
     random.seed(sd)
@@ -166,8 +165,8 @@ def createMatrices(filename, sd=1234, ratio=0.6):
 
             image = readPGM(datadir + '/' + trainlist[i].rstrip('\n'))
 
-            width = image.shape[0]
-            height = image.shape[1]
+            height = image.shape[0]
+            width = image.shape[1]
 
             XTrain = np.empty((width * height, len(trainlist)))
 
@@ -184,8 +183,8 @@ def createMatrices(filename, sd=1234, ratio=0.6):
 
             image = readPGM(datadir + '/' + testlist[j].rstrip('\n'))
 
-            width = image.shape[0]
-            height = image.shape[1]
+            height = image.shape[0]
+            width = image.shape[1]
 
             XTest = np.empty((width * height, len(testlist)))
 

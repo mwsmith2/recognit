@@ -2,12 +2,11 @@
 
 import analyze
 import load
-import numpy as np
 
-filename = 'faces/straight_open_2_faces.txt'
+filename = 'faces/straight_open_0_faces.txt'
 
 XTrain, XTest, trainlist, testlist = load.createMatrices(filename)
-weightDict, eigvecs = analyze.characterizeFaces(XTrain, trainlist)
+weightDict, eigvecs, meanface = analyze.characterizeFaces(XTrain, trainlist)
 
 success = 0
 successlist = []
@@ -20,7 +19,7 @@ faildistance = []
 for imgname in testlist:
 
     image = load.readPGM('faces/' + imgname.rstrip('\n'))
-    weight = analyze.calcWeight(image.reshape(-1), eigvecs)
+    weight = analyze.calcWeight(image.reshape(-1), eigvecs, meanface)
     person, distance = analyze.guessLabel(weightDict, weight)
 
     if person == imgname.split('_')[0]:

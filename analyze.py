@@ -6,6 +6,7 @@ __email__ = "ukaratay@uw.edu, mwsmith2@uw.edu"
 import numpy as np
 import scipy.linalg as spl
 from collections import defaultdict
+from scipy.spatial.distance import euclidean
 
 
 def calculateEig(X):
@@ -29,17 +30,18 @@ def calculateEig(X):
 
     """
 
-    # Our data needs to be centered.
+    # Calculate the mean face.
+    meanface = X.mean(axis=-1)
+
     for i in range(X.shape[1]):
 
-        X[:, i] -= X[:, i].mean()
+        X[:, i] = X[:, i] - meanface
 
-    # Get eigenvalues and vectors of cov(X_transpose) in ascending order.
+    # Get eigenvalues and vectors of cov(X.T * X) in ascending order.
     eigval, eigvec = spl.eigh(np.dot(X.T, X))
 
     # Convert these to eigenvalues of the cov(X).
-    eigval = eigval / eigval.mean()
-    eigvec = np.dot(eigvec, X.T)
+    eigvec = np.dot(X, eigvec)
 
     for i in range(eigvec.shape[0]):
 
@@ -78,6 +80,8 @@ def characterizeFaces(XTrain, trainlist, threshold=0.95):
     featureDict = createDict(trainlist)  # Create a feature dictionary.
     eigval, eigvec = calculateEig(XTrain)  # Calculate eigenvectors.
 
+    meanface = XTrain.mean(axis=-1)  # Calculate mean face.
+
     eignorm = eigval.cumsum() / eigval.sum()  # Normalize them.
 
     neig = np.abs(eignorm - threshold).argmin()  # Select the principal ones.
@@ -90,12 +94,13 @@ def characterizeFaces(XTrain, trainlist, threshold=0.95):
 
         for idx in featureDict[feature]:
 
-            weightList += np.dot(XTrain[:, idx], eigvec[:neig].T)
+            XTrain[:, idx] = XTrain[:, idx] - meanface
+            weightList += np.dot(eigvec[:, :neig].T, XTrain[:, idx])
 
         # Normalize weights.
         weightDict[feature] = weightList / len(featureDict[feature])
 
-    return weightDict, eigvec[:neig]
+    return weightDict, eigvec[:, :neig], meanface
 
 
 def guessLabel(weightDict, weight):
@@ -127,17 +132,19 @@ def guessLabel(weightDict, weight):
 
     for feature in weightDict:
 
-        distance[feature] = spl.norm(weightDict[feature] - weight)
+        distance[feature] = euclidean(weightDict[feature], weight)
 
     label = min(distance, key=distance.get)
 
     return label, distance[label]
 
 
-def calcWeight(image, eigvec):
+def calcWeight(image, eigvec, meanface):
     """Calculate weights for a given image."""
 
-    weight = np.dot(image, eigvec.T)
+    image = image - meanface
+
+    weight = np.dot(eigvec.T, image)
 
     return weight
 
