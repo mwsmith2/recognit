@@ -3,7 +3,7 @@
 import analyze
 import load
 
-filename = 'faces/straight_open_0_faces.txt'
+filename = 'faces/straight_open_4_faces.txt'
 
 XTrain, XTest, trainlist, testlist = load.createMatrices(filename)
 weightDict, eigvecs, meanface = analyze.characterizeFaces(XTrain, trainlist)

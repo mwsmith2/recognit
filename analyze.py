@@ -43,12 +43,12 @@ def calculateEig(X):
     # Convert these to eigenvalues of the cov(X).
     eigvec = np.dot(X, eigvec)
 
-    for i in range(eigvec.shape[0]):
+    for i in range(eigvec.shape[1]):
 
-        eigvec[i] = eigvec[i] / spl.norm(eigvec[i])
+        eigvec[:, i] = eigvec[:, i] / spl.norm(eigvec[:, i])
 
     # Return the largest n eigenvalues and vectors.
-    return eigval[::-1], eigvec[::-1]
+    return eigval[::-1], eigvec[:, ::-1]
 
 
 def characterizeFaces(XTrain, trainlist, threshold=0.95):
