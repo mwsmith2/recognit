@@ -7,6 +7,7 @@ import numpy as np
 import scipy.linalg as spl
 from collections import defaultdict
 from scipy.spatial.distance import euclidean
+from sklearn import neighbors
 
 
 def calculateEig(X):
@@ -90,20 +91,21 @@ def characterizeFaces(XTrain, trainlist, threshold=0.95):
     # Calculate weights for every feature in the dictionary.
     for feature in featureDict:
 
-        weightList = np.zeros(neig)
+        weights = {}
+        i = 0
 
         for idx in featureDict[feature]:
 
             XTrain[:, idx] = XTrain[:, idx] - meanface
-            weightList += np.dot(eigvec[:, :neig].T, XTrain[:, idx])
+            weights[i] = np.dot(eigvec[:, :neig].T, XTrain[:, idx])
+            i += 1
 
-        # Normalize weights.
-        weightDict[feature] = weightList / len(featureDict[feature])
+        weightDict[feature] = weights
 
     return weightDict, eigvec[:, :neig], meanface
 
 
-def guessLabel(weightDict, weight):
+def guessDistance(weightDict, weight):
     """ Gets weight dictionary and weights for a single image and
         guesses the label for asked feature.
 
@@ -132,11 +134,50 @@ def guessLabel(weightDict, weight):
 
     for feature in weightDict:
 
-        distance[feature] = euclidean(weightDict[feature], weight)
+        d = np.zeros(len(weight))
+
+        for idx in weightDict[feature]:
+
+            d += euclidean(weightDict[feature][idx], weight)
+
+        distance[feature] = d / len(weightDict[feature])
 
     label = min(distance, key=distance.get)
 
-    return label, distance[label]
+    return label
+
+
+def guesskNN(weightDict, weight):
+
+    labelDict = {}
+    i = 0
+
+    size = sum(len(feature) for feature in weightDict.itervalues())
+
+    for feature in weightDict:
+
+        labelDict[feature] = i
+        i += 1
+
+    x = np.empty((size, len(weight)))
+    y = np.empty(size)
+    i = 0
+
+    for feature in weightDict:
+
+        for idx in weightDict[feature]:
+
+            x[i, :] = weightDict[feature][idx]
+            y[i] = labelDict[feature]
+            i += 1
+
+    clf = neighbors.KNeighborsClassifier(3)
+    clf.fit(x, y)
+    p = clf.predict(weight)
+
+    guess = [label for label, value in labelDict.items() if value==p[0]][0]
+
+    return guess
 
 
 def calcWeight(image, eigvec, meanface):

@@ -29,7 +29,7 @@ for i in range(len(size)):
 
             image = load.readPGM('faces/' + imgname.rstrip('\n'))
             weight = analyze.calcWeight(image.reshape(-1), eigvecs, meanface)
-            person, distance = analyze.guessLabel(weightDict, weight)
+            person = analyze.guessDistance(weightDict, weight)
 
             if person == imgname.split('_')[0]:
 
@@ -50,7 +50,7 @@ plt.xlabel('Threshold')
 plt.ylabel('Number of Eigenvectors')
 plt.legend(loc=0)
 
-plt.savefig("neig.pdf")
+#plt.savefig("neig.pdf")
 plt.close()
 
 plt.plot(t, rate[0, :], 'r', label="High resolution", linewidth=2.0)
@@ -61,5 +61,5 @@ plt.xlabel('Threshold')
 plt.ylabel('Success Rate [%]')
 plt.legend(loc=0)
 
-plt.savefig("rate.pdf")
+#plt.savefig("rate.pdf")
 plt.close()
