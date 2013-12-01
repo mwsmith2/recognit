@@ -1,5 +1,3 @@
-#pca_test.py
-
 import matplotlib
 matplotlib.use('PDF')
 import matplotlib.pyplot as plt

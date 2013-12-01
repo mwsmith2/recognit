@@ -2,7 +2,7 @@ import load
 from pca import PCA, LDA
 
 
-filename = 'faces/straight_open_0_faces.txt'
+filename = 'data/straight_open_0_faces.txt'
 XTrain, XTest, trainlist, testlist = load.createMatrices(filename, sd=659, ratio=0.65)
 
 clf = PCA(XTrain)
@@ -14,7 +14,7 @@ fail = 0
 
 for imgname in testlist:
 
-    image = load.readPGM('faces/' + imgname.rstrip('\n'))
+    image = load.readPGM('data/faces/' + imgname.rstrip('\n'))
     person = clf.predict(image.reshape(-1))
 
     if person.split('_')[0] == imgname.split('_')[0]:
@@ -30,13 +30,13 @@ for imgname in testlist:
 
 c = []
 for string in trainlist:
-    
+
     c.append(string.split('_')[0])
 
 clLDA = LDA(clf.weights, c)
 clLDA.findComponents(clf.eigvec)
 clLDA.createDatabase(clf.x)
-    
+
 successLDA = 0
 failLDA = 0
 
@@ -44,8 +44,7 @@ for imgname in testlist:
 
     image = load.readPGM('faces/' + imgname.rstrip('\n'))
     person = clLDA.predict(image.reshape(-1))
-    
-    
+
     if person == imgname.split('_')[0]:
 
         successLDA += 1

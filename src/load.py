@@ -42,7 +42,6 @@ def readPGM(filename):
         f.close()
         image = decodeP5(filename)
 
-
         return image
 
     else:
