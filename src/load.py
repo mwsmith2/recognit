@@ -9,6 +9,113 @@ import random
 from matplotlib.image import imread
 
 
+class Faces:
+
+    def __init__(self, path, ext):
+
+        self.path = path
+        self.ext = ext
+        self.filelist = []
+
+        for f in os.listdir(self.path):
+
+            if (f.endswith(self.ext) and
+                    os.path.isfile(os.path.join(self.path, f))):
+
+                self.filelist.append(f)
+
+    def setParams(self, seed=None, train=0.5, valid=0.25):
+
+        random.seed(seed)
+        self.trr = train
+        self.var = valid
+
+    def getLabels(self, delimiter='_'):
+
+        self.labels = []
+        self.nlabels = len(self.filelist[0][:-4].split(delimiter))
+
+        for f in self.filelist:
+
+            self.labels.append(dict(enumerate(f[:-4].split(delimiter))))
+
+        for i in range(self.nlabels):
+
+            unique = set([label[i] for label in self.labels])
+            print "ID = {0}: ".format(i), unique
+
+    def getData(self, ID=0, exclude={0: None}):
+
+        self.ID = ID
+        self.exclude = exclude
+
+        self.datalist = self.filelist[:]
+        self.labellist = self.labels[:]
+
+        for f, label in zip(self.filelist, self.labels):
+
+            for key in self.exclude.keys():
+
+                for feature in self.exclude[key]:
+
+                    if (label[key] == feature):
+
+                        try:
+
+                            self.datalist.remove(f)
+                            self.labellist.remove(label)
+
+                        except ValueError:
+
+                            pass
+
+        self.fileload = [os.path.join(self.path, f) for f in self.datalist]
+        self.y = [label[self.ID] for label in self.labellist]
+
+    def loadMatrix(self, filelist):
+
+        for i, f in enumerate(filelist):
+
+            if i == 0:
+
+                image = readPGM(f)
+
+                height = image.shape[0]
+                width = image.shape[1]
+
+                X = np.empty((height * width, len(filelist)))
+
+                X[:, i] = image.reshape(-1)
+
+            else:
+
+                image = readPGM(f)
+                X[:, i] = image.reshape(-1)
+
+        return X
+
+    def createMatrices(self):
+
+        randomizedlist = zip(self.fileload, self.y)
+        random.shuffle(randomizedlist)
+
+        nelements = len(randomizedlist)
+        ntrain = int(self.trr * nelements)
+        nvalid = int(self.var * nelements) + ntrain
+
+        trainfilelist, YTrain = zip(*randomizedlist[:ntrain])
+        validfilelist, YValid = zip(*randomizedlist[ntrain:nvalid])
+        testfilelist, YTest = zip(*randomizedlist[nvalid:])
+
+        self.XTrain = self.loadMatrix(trainfilelist)
+        self.XValid = self.loadMatrix(validfilelist)
+        self.XTest = self.loadMatrix(testfilelist)
+
+        self.YTrain = list(YTrain)
+        self.YValid = list(YValid)
+        self.YTest = list(YTest)
+
+
 def readPGM(filename):
     """
     PGM to numpy.ndarray converter.
@@ -114,240 +221,3 @@ def decodeP5(filename):
     image = imread(filename)
 
     return image
-
-
-def createMatrices(filename, sd=1234, ratio=0.6):
-    """
-    Creates matrices for training and test.
-
-    Parameters
-    ----------
-    filename : path
-
-            Path to .txt file that includes list of PGM images.
-
-    sd : int
-
-            Seed for random set generation. The default is 1234.
-
-    ratio : float
-
-            Ratio of images in training set to total number. Default is 0.6.
-
-    Returns
-    -------
-    XTrain : array_like
-
-            Matrix of PGM images. Every column corresponds to an image.
-
-    XTest : array_like
-
-            Matrix of PGM images. Every column corresponds to an image.
-
-    """
-
-    datadir = os.path.dirname(os.path.abspath(filename))
-
-    with open(filename) as f:
-
-        filelist = f.readlines()
-
-    nimages = len(filelist)
-
-    random.seed(sd)
-    trainlist = random.sample(filelist, int(nimages * ratio))
-    testlist = [x for x in filelist if x not in trainlist]
-
-    for i in range(len(trainlist)):
-
-        if i == 0:
-
-            image = readPGM(datadir + '/' + trainlist[i].rstrip('\n'))
-
-            height = image.shape[0]
-            width = image.shape[1]
-
-            XTrain = np.empty((width * height, len(trainlist)))
-
-            XTrain[:, i] = image.reshape(-1)
-
-        else:
-
-            image = readPGM(datadir + '/' + trainlist[i].rstrip('\n'))
-            XTrain[:, i] = image.reshape(-1)
-
-    for j in range(len(testlist)):
-
-        if j == 0:
-
-            image = readPGM(datadir + '/' + testlist[j].rstrip('\n'))
-
-            height = image.shape[0]
-            width = image.shape[1]
-
-            XTest = np.empty((width * height, len(testlist)))
-
-            XTest[:, j] = image.reshape(-1)
-
-        else:
-
-            image = readPGM(datadir + '/' + testlist[j].rstrip('\n'))
-            XTest[:, j] = image.reshape(-1)
-
-    return XTrain, XTest, trainlist, testlist
-
-class Faces():
-
-    def __init__(self, filename, sd=1234, ratio=0.6):
-
-        self.XTrain, self.XTest, trainlist, testlist = createMatrices(filename, sd=sd, ratio=ratio) 
-
-        self.YTrain = []
-        for labels in trainlist:
-            self.YTrain.append(labels[6:-5].split('_'))
-            # 6:-5 cuts off faces/ prefix and .pgd suffix  
-
-        self.YTest = []
-        for labels in testlist:
-            self.YTest.append(labels[6:-5].split('_'))
-
-        self.XTrainCut = self.XTrain
-        self.XTestCut  = self.XTest
-        self.YTrainCut = list(self.YTrain)
-        self.YTestCut  = list(self.YTest)
-
-        # A few more list to hold our cuts
-        self.blacklist = [] # Use to cut from data
-        self.whitelist = []
-        for s in self.YTrain[0]:
-            self.whitelist.append("")
-
-        # Store the current number of samples
-        self.nTestPoints = self.XTestCut.shape[1]
-        self.nTrainPoints = self.XTrainCut.shape[1]
-        self.upToDate = True
-
-    def flag(self, badLabel):
-
-        if isinstance(badLabel, list):
-            for label in badLabel:
-                self.blacklist.append(label)
-        else:
-            self.blacklist.append(badLabel)
-
-        self.upToDate = False
-
-    def clearFlags(self):
-
-        self.blacklist = []
-
-        self.upToDate  = False
-
-    def force(self, labelID, label=""):
-
-        try: 
-            self.whitelist[labelID] = label
-
-        except IndexError:
-            print "No such label ID."
-            pass
-
-        self.upToDate = False
-
-    def clearForce(self):
-
-        self.whitelist = []
-        for s in self.YTrain[0]:
-            self.whitelist.append('')
-
-        self.upToDate = False
-
-    def build(self):
-
-        # Check if needs to be rebuilt
-        if self.upToDate:
-            return
-
-        # Rebuild the data and labels with cuts
-        cutIdx = 0
-        oldIdx = 0
-        for y in self.YTrain:
-
-            flagged = False
-
-            for label in y:
-                if label in self.blacklist:
-                    flagged = True
-
-            for w in self.whitelist:
-                if (w != '' and w not in y):
-                    flagged = True
-
-            if flagged:
-                oldIdx += 1
-                continue
-
-            print cutIdx, oldIdx
-
-            self.XTrainCut[:, cutIdx] = self.XTrain[:, oldIdx]
-            self.YTrainCut[cutIdx] = y
-
-            cutIdx += 1
-            oldIdx += 1
-
-        self.nTrainPoints = cutIdx
-
-        cutIdx = 0
-        oldIdx = 0
-        for y in self.YTest:
-
-            flagged = False
-
-            for label in y:
-                if label in self.blacklist:
-                    flagged = True
-
-
-            for w in self.whitelist:
-                if (w != '' and w not in y):
-                    flagged = True
-
-            if flagged:
-                oldIdx += 1
-                continue
-
-            print cutIdx, oldIdx
-
-            self.XTestCut[:, cutIdx] = self.XTest[:, oldIdx]
-            self.YTestCut[cutIdx] = y
-
-            cutIdx += 1
-            oldIdx += 1
-
-        self.nTestPoints = cutIdx
-        self.upToDate = True
-
-    def getTrain(self, labelID):
-
-        self.build()
-        YTrain = []
-        for y in self.YTrainCut:
-            YTrain.append(y[labelID])
-
-        return self.XTrainCut[:, :self.nTrainPoints], YTrain[:self.nTrainPoints]
-
-    def getTest(self, labelID):
-
-        self.build()
-        YTest = []
-        for y in self.YTestCut:
-            YTest.append(y[labelID])
-
-        return self.XTestCut[:, :self.nTestPoints], YTest[:self.nTestPoints]
-
-
-
-
-
-
-
