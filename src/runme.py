@@ -1,35 +1,29 @@
 import load
-from analysis import PCA
+import pca
+import predict
 
+# Loading stuff will come here.
 
-filename = '../data/straight_open_0_faces.txt'
-XTrain, XTest, trainlist, testlist = load.createMatrices(filename, sd=659, ratio=0.65)
-
-clf = PCA(XTrain)
+clf = pca.PCA(XTrain)
 clf.findPrincipalComponents()
-clf.createDatabase(trainlist)
+clf.transform()
 
-methods = ['mahalanobis', '3NN', 'GMM', 'SVM', 'LDA']
-rate = []
+predictor = predict.Predictor(clf.xtransform, YTrain)
 
-for mth in methods:
+success = []
+fail = []
 
-    success = 0
-    fail = 0
+for i, y in enumerate(YTest):
 
-    for imgname in testlist:
+    predictor.setData(XTest[i, :])
+    prediction = predictor.distance()
 
-        image = load.readPGM('../data/' + imgname.rstrip('\n'))
-        person = clf.predict(image.reshape(-1), method=mth)
+    if (prediction == y):
 
-        if person == imgname.split('_')[0]:
+        success.append(prediction)
 
-            success += 1
+    else:
 
-        else:
+        fail.append(prediction)
 
-            fail += 1
-
-    rate.append(100 * success / float(success + fail))
-
-print rate
+rate = 100 * len(success) / float(len(success + fail)))
