@@ -20,7 +20,7 @@ class Predictor:
 
     def setData(self, s):
 
-        self.s = s
+        self.s = s.T
 
     def distance(self, method='mahalanobis'):
 

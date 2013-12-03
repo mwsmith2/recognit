@@ -2,7 +2,7 @@ import load
 import pca
 import predict
 
-path = 'C:/Users/ukara_000/SkyDrive/UW/Courses/CSE546/Project/data/faces'
+path = '../data/faces'
 
 # Load faces from the path.
 faces = load.Faces(path, 'pgm')
@@ -23,7 +23,8 @@ fail = []
 
 for i, y in enumerate(faces.YTest):
 
-    predictor.setData(faces.XTest[i, :])
+    s = clf.project(faces.XTest[:, i])
+    predictor.setData(s)
     prediction = predictor.distance()
 
     if (prediction == y):
