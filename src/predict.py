@@ -33,7 +33,7 @@ class Predictor:
 
         kNN = KNeighborsClassifier(n_neighbors=k, weights=weights)
         kNN.fit(self.x, self.y)
-        prediction = kNN.predict(self.s)
+        prediction = kNN.predict(self.s)[0]
 
         return prediction
 
@@ -52,7 +52,7 @@ class Predictor:
         gmm = GMM(n_components=len(unique), init_params='wc')
         gmm.means_ = means
         gmm.fit(self.x)
-        prediction = unique[gmm.predict(self.s)]
+        prediction = unique[gmm.predict(self.s)][0]
 
         return prediction
 
@@ -60,7 +60,7 @@ class Predictor:
 
         svm = SVC(kernel=kernel, degree=degree, gamma=gamma, C=C)
         svm.fit(self.x, self.y)
-        prediction = svm.predict(self.s)
+        prediction = svm.predict(self.s)[0]
 
         return prediction
 
@@ -68,6 +68,6 @@ class Predictor:
 
         lda = LDA()
         lda.fit(self.x, self.y)
-        prediction = lda.predict(self.s)
+        prediction = lda.predict(self.s)[0]
 
         return prediction
