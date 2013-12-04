@@ -16,7 +16,7 @@ faces = load.Faces(path, 'pgm')
 faces.setParams(seed=895, train=0.60, valid=0.15)
 faces.getLabels()
 
-res = 4
+res = 0
 trait = 0
 nweights = 5 # plots all weights less against each other
 
@@ -56,7 +56,7 @@ print rate
 # Plot the Eigenfaces first
 n = 2 ** (res / 2) # This guy resizes the images properly.
 E = []
-for i in xrange(min(len(clf.eigvec), 16)):
+for i in xrange(min(len(clf.eigvec), 18)):
 	e = clf.eigvec[:,i].reshape([120/n, 128/n]) 
 	E.append(vis.normalize(e, 0, 255))
 	
@@ -71,7 +71,7 @@ xtran = lda.transform(clf.xtransform.T)
 ff = np.dot(clf.eigvec[:,:xtran.shape[1]], xtran.T)
 
 E = []
-for i in xrange(min(len(ff), 16)):
+for i in xrange(min(len(ff), 18)):
 	e = ff[:,i].reshape([120/n, 128/n]) 
 	E.append(vis.normalize(e, 0, 255))
 

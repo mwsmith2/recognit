@@ -4,16 +4,16 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import numpy as np
 
-m_dpi = 160
+m_dpi = 600
 
 def create_font(fontname='Tahoma', fontsize=10):
 	return { 'fontname': fontname, 'fontsize': fontsize }
 
-def plotFaces(title, images, rows=4, cols=4, sptitle="subplot", sptitles=[], colormap=cm.jet, filename=None):
+def plotFaces(title, images, rows=3, cols=6, sptitle="subplot", sptitles=[], colormap=cm.jet, filename=None):
 
 	plt.clf()
 
-	fig = plt.figure(figsize=(8, 11), dpi=m_dpi)
+	fig = plt.figure(figsize=(15, 8), dpi=m_dpi)
 	fig.text(.5, .95, title, horizontalalignment='center')
 
 	for i in xrange(len(images)):
