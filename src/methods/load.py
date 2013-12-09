@@ -1,4 +1,5 @@
-"""load.py: Contains functions to load PGM file types and create datasets."""
+"""load.py: Contains functions and classes to load PGM file types and
+create datasets."""
 
 __author__ = "Durmus U. Karatay, Matthias W. Smith"
 __email__ = "ukaratay@uw.edu, mwsmith2@uw.edu"
@@ -10,13 +11,16 @@ from matplotlib.image import imread
 
 
 class Faces:
+    """Class for keeping all the features and data organized."""
 
     def __init__(self, path, ext):
 
+        # Get the path and extension for image files.
         self.path = path
         self.ext = ext
         self.filelist = []
 
+        # Scan the path for extension.
         for f in os.listdir(self.path):
 
             if (f.endswith(self.ext) and
@@ -25,12 +29,14 @@ class Faces:
                 self.filelist.append(f)
 
     def setParams(self, seed=None, train=0.5, valid=0.25):
+        """Set parameters for generating data matrices."""
 
         random.seed(seed)
         self.trr = train
         self.var = valid
 
     def getLabels(self, delimiter='_'):
+        """ Create labels from the filename given the delimiter."""
 
         self.labels = []
         self.nlabels = len(self.filelist[0][:-4].split(delimiter))
@@ -45,6 +51,7 @@ class Faces:
             print "ID = {0}: ".format(i), unique
 
     def getData(self, ID=0, exclude={0: None}):
+        """Given the ID of label organizes data accordingly."""
 
         self.ID = ID
         self.exclude = exclude
@@ -69,10 +76,12 @@ class Faces:
 
                             pass
 
-        self.fileload = [os.path.join(self.path, f) for f in self.datalist]
+        self.fileload = [os.path.join(self.path, f) for f in
+                         self.datalist]
         self.y = [label[self.ID] for label in self.labellist]
 
     def loadMatrix(self, filelist):
+        """Load the images into a matrix given filelist."""
 
         for i, f in enumerate(filelist):
 
@@ -95,6 +104,7 @@ class Faces:
         return X
 
     def createMatrices(self):
+        """Randomize and divide data into sets and load into matrices."""
 
         randomizedlist = zip(self.fileload, self.y)
         random.shuffle(randomizedlist)
