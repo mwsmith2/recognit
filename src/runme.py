@@ -1,10 +1,5 @@
-import load
-import pca
-import predict
+from methods import *
 import numpy as np
-import matplotlib
-matplotlib.use('PDF')
-import matplotlib.pyplot as plt
 
 path = '../data/faces'
 rate = []
@@ -50,24 +45,4 @@ for i, r in enumerate(res):
                 success += 1.0
 
         rate[i, j] = success / len(faces.YTest)
-        print "%{0: .2f} success in predicting.".format(rate[i, j] * 100)
-
-N = 4
-ind = np.arange(N) + 0.125
-width = 0.25
-
-fig, ax = plt.subplots()
-
-rects1 = ax.bar(ind, rate[0, :] * 100, width, color='#A6CEE3')
-rects2 = ax.bar(ind + width, rate[1, :] * 100, width, color='#1F78B4')
-rects3 = ax.bar(ind + 2 * width, rate[2, :] * 100, width, color='#B2DF8A')
-
-ax.set_ylabel('Success Rate [%]', fontsize='xx-large')
-ax.set_xticks(ind + 1.5 * width)
-ax.set_xticklabels(('Person', 'Orientation', 'Mood', 'Eyewear'),
-                   fontsize='xx-large')
-ax.legend((rects1[0], rects2[0], rects3[0]),
-          ('Hi-Res', 'Med-Res', 'Lo-Res'), fontsize='xx-large')
-ax.tick_params(axis='both', which='major', labelsize='xx-large')
-fig.set_size_inches(16, 12)
-plt.savefig('../tex/fig/test.pdf', dpi=600)
+        print "%{0: .2f} success in predicting feature {1} for resolution {2}.".format(rate[i, j] * 100, j, r)
