@@ -50,7 +50,7 @@ def scatterFace(title, faceweights, x1=1, x2=2, filename=None):
 	plt.clf()
 
 	fig = plt.figure(figsize=(12, 8), dpi=m_dpi)
-	fig.text(0.5, 0.95, title, horizontalalignment='center')
+	#fig.text(0.5, 0.95, title, horizontalalignment='center')
 
 	colors = cm.gist_ncar(np.linspace(0, 1, len(faceweights)))
 
@@ -86,7 +86,7 @@ def scatterFace(title, faceweights, x1=1, x2=2, filename=None):
 	plt.xlim(plt.xlim()[0], plt.xlim()[1] + 0.2 * (plt.xlim()[1] - plt.xlim()[0]))
 	plt.xlabel(r'$\omega_' + str(x1) + r'$', fontsize=16)
 	plt.ylabel(r'$\omega_' + str(x2) + r'$', fontsize=16)
-	plt.legend(loc=4, fontsize='small')
+	plt.legend(loc=4)
 
 	if filename is None:
 		plt.show() 
