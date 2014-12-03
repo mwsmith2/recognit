@@ -1,3 +1,5 @@
+import os
+
 import matplotlib.cm as cm
 from sklearn.lda import LDA
 import numpy as np
@@ -5,12 +7,13 @@ from collections import defaultdict
 from scipy.spatial.distance import cdist
 import matplotlib.pyplot as plt
 
-import load
-import pca
-import predict
-import visual as vis
+from rmf import load
+from rmf import pca
+from rmf import predict
+from rmf import visual as vis
 
-path = '../data/faces'
+base = os.path.dirname(__file__)
+path = os.path.realpath(base + '/../data/faces')
 
 # Load faces from the path.
 faces = load.Faces(path, 'pgm')

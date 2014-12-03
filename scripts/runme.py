@@ -1,7 +1,9 @@
-from methods import *
+import os
 import numpy as np
+from rmf import *
 
-path = '../data/faces'
+base = os.path.dirname(__file__)
+path = os.path.realpath(base + '/../data/faces')
 rate = []
 
 # Load faces from the path.
