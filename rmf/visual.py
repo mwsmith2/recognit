@@ -12,17 +12,70 @@ def create_font(fontname='Tahoma', fontsize=10):
 
 	Parameters
 	----------
-	string: fontname
+	string : fontname
+
+		The desired font, i.e., Times New Roman, Verdana, etc.
+
 	int: fontsize
+
+		The fontsize used for display on the figure.
 
 	Returns
 	-------
-	dictionary-like:  matplotlib font dictionary-like
+	dictionary-like : matplotlib 
+
+		A font dictionary used by matplotlib figures.
+
 	"""
-	
+
 	return { 'fontname': fontname, 'fontsize': fontsize }
 
 def plot_faces(title, images, rows=3, cols=6, sptitle="subplot", sptitles=[], colormap=cm.jet, filename=None):
+	"""
+	Plots a grid of faces, useful for plotting eigenfaces/fisherfaces.
+
+	Parameters
+	----------
+
+	string : title
+
+		Title for the whole set of plots.
+
+	array-like: images
+
+		The set of images to be plotted.
+
+	int : rows
+
+		Number of rows in face image grid.
+
+	int : cols
+
+		Number of columns in the face image grid.
+
+	string : sptitle
+
+		The title to be numbered and used on each subplot.
+
+	list of strings : sptitles
+
+		A set of different titles to be called for each sequential subplot.
+
+	matplotlib cm : colormap
+
+		The color gradient that represents intensity on the figure.
+
+	string : filename
+
+		Output filename to save the image to disk.
+
+	Returns
+	-------
+
+	None
+
+	"""
+
 
 	plt.clf()
 
