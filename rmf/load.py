@@ -10,7 +10,7 @@ import random
 from matplotlib.image import imread
 
 
-class Faces:
+class Faces(object):
     """Class for keeping all the features and data organized."""
 
     def __init__(self, path, ext):

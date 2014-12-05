@@ -7,7 +7,7 @@ import numpy as np
 from scipy.linalg import eig, norm
 
 
-class PCA:
+class PCA(object):
 
     def __init__(self, x):
 

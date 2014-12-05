@@ -7,6 +7,19 @@ import numpy as np
 m_dpi = 600
 
 def create_font(fontname='Tahoma', fontsize=10):
+	"""
+	Create a font object to be used in matplotlib figures.
+
+	Parameters
+	----------
+	string: fontname
+	int: fontsize
+
+	Returns
+	-------
+	dictionary-like:  matplotlib font dictionary-like
+	"""
+	
 	return { 'fontname': fontname, 'fontsize': fontsize }
 
 def plot_faces(title, images, rows=3, cols=6, sptitle="subplot", sptitles=[], colormap=cm.jet, filename=None):

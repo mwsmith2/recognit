@@ -11,7 +11,7 @@ from sklearn.svm import SVC
 from sklearn.lda import LDA
 
 
-class Predictor:
+class Predictor(object):
     """Class for different classifiers to predict labels."""
 
     def __init__(self, x, y):
