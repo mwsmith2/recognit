@@ -6,7 +6,7 @@ __email__ = "ukaratay@uw.edu, mwsmith2@uw.edu"
 import numpy as np
 from scipy.spatial.distance import cdist
 from sklearn.neighbors import KNeighborsClassifier
-from sklearn.mixture import GMM
+from sklearn.mixture import gmm
 from sklearn.svm import SVC
 from sklearn.lda import LDA
 
@@ -20,7 +20,7 @@ class Predictor:
         self.x = x.T
         self.y = y
 
-    def setData(self, s):
+    def set_data(self, s):
 
         # Load the data for label prediction.
         self.s = s.T
@@ -33,16 +33,16 @@ class Predictor:
 
         return prediction
 
-    def kNN(self, k=3, weights='distance'):
-        """kNN algorithm with weighting option."""
+    def knn(self, k=3, weights='distance'):
+        """knn algorithm with weighting option."""
 
-        kNN = KNeighborsClassifier(n_neighbors=k, weights=weights)
-        kNN.fit(self.x, self.y)
-        prediction = kNN.predict(self.s)[0]
+        knn = KNeighborsClassifier(n_neighbors=k, weights=weights)
+        knn.fit(self.x, self.y)
+        prediction = knn.predict(self.s)[0]
 
         return prediction
 
-    def GMM(self):
+    def gmm(self):
         """Gaussian Mixture Models algorithm."""
 
         # Use semi-supervised Gaussian mixtures.
@@ -55,7 +55,7 @@ class Predictor:
 
             means[i, :] = self.x[self.y == unique[i]].mean(axis=0)
 
-        gmm = GMM(n_components=len(unique), init_params='wc')
+        gmm = gmm(n_components=len(unique), init_params='wc')
         gmm.means_ = means
         gmm.fit(self.x)
         prediction = unique[gmm.predict(self.s)][0]

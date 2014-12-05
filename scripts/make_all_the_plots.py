@@ -20,8 +20,8 @@ nweights = 5 #For plotting different omegas against eachother
 
 # Load faces from the path.
 faces = load.Faces(path, 'pgm')
-faces.setParams(seed=895, train=0.60, valid=0.15)
-faces.getLabels()
+faces.set_params(seed=895, train=0.60, valid=0.15)
+faces.get_labels()
 
 for res in range(0, 6, 2):
 
@@ -31,22 +31,22 @@ for res in range(0, 6, 2):
 		reslist = ['0', '2', '4']
 		reslist.remove(str(res))
 
-		faces.getData(ID=trait, exclude={4: reslist})
-		faces.createMatrices()
+		faces.get_data(id=trait, exclude={4: reslist})
+		faces.create_matrices()
 
 		# Start principal component analysis.
-		clf = pca.PCA(faces.XTrain)
-		clf.findPrincipalComponents()
+		clf = pca.PCA(faces.xtrain)
+		clf.find_principal_components()
 		clf.transform()
 
-		predictor = predict.Predictor(clf.xtransform, faces.YTrain)
+		predictor = predict.Predictor(clf.xtransform, faces.ytrain)
 
 		success = []
 		fail = []
 
-		for i, y in enumerate(faces.YTest):
+		for i, y in enumerate(faces.ytest):
 
-		    predictor.setData(clf.project(faces.XTest[:, i]))
+		    predictor.set_data(clf.project(faces.xtest[:, i]))
 		    prediction = predictor.distance()
 
 		    if (prediction == y):
@@ -69,12 +69,12 @@ for res in range(0, 6, 2):
 				E.append(vis.normalize(e, 0, 255))
 				
 			fn = prefix + "eigenfaces.pdf"
-			vis.plotFaces(title="Eigenfaces", images=E, sptitle=" Eigenface", filename=fn)
+			vis.plot_faces(title="Eigenfaces", images=E, sptitle=" Eigenface", filename=fn)
 
 
 			# Plot our Fisherfaces
 			lda = LDA()
-			lda.fit(clf.xtransform.T, faces.YTrain)
+			lda.fit(clf.xtransform.T, faces.ytrain)
 			xtran = lda.transform(clf.xtransform.T)
 			ff = np.dot(clf.eigvec[:,:xtran.shape[1]], xtran.T)
 
@@ -84,7 +84,7 @@ for res in range(0, 6, 2):
 				E.append(vis.normalize(e, 0, 255))
 
 			fn = prefix + "fisherfaces.pdf"
-			vis.plotFaces(title="Fisherfaces", images=E, sptitle=" Fisherface", filename=fn)
+			vis.plot_faces(title="Fisherfaces", images=E, sptitle=" Fisherface", filename=fn)
 
 		# Plot the clusters given by first two weights
 		for k in range(nweights):
@@ -92,8 +92,8 @@ for res in range(0, 6, 2):
 
 				faceweights = defaultdict(list)
 
-				for i, y in enumerate(faces.YTest):
-					s  = clf.project(faces.XTest[:, i])
+				for i, y in enumerate(faces.ytest):
+					s  = clf.project(faces.xtest[:, i])
 					x1 = s[j]
 					x2 = s[k]
 					d  = np.min(cdist(clf.xtransform.T, s.T))
@@ -101,5 +101,5 @@ for res in range(0, 6, 2):
 
 				fn = prefix + "face_scatter_w" + str(j+1) + "_v_w" + str(k+1) + ".pdf"
 				title = r'Principal Components: $\omega_' + str(j+1) + r'$ vs. $\omega_' + str(k+1) + r'$'
-				vis.scatterFace(title, faceweights, x1=j+1, x2=k+1, filename=fn)
+				vis.scatter_face(title, faceweights, x1=j+1, x2=k+1, filename=fn)
 

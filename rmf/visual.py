@@ -9,7 +9,7 @@ m_dpi = 600
 def create_font(fontname='Tahoma', fontsize=10):
 	return { 'fontname': fontname, 'fontsize': fontsize }
 
-def plotFaces(title, images, rows=3, cols=6, sptitle="subplot", sptitles=[], colormap=cm.jet, filename=None):
+def plot_faces(title, images, rows=3, cols=6, sptitle="subplot", sptitles=[], colormap=cm.jet, filename=None):
 
 	plt.clf()
 
@@ -45,7 +45,7 @@ def normalize(a, lo, hi):
 	a *= sf
 	return a
 
-def scatterFace(title, faceweights, x1=1, x2=2, filename=None):
+def scatter_face(title, faceweights, x1=1, x2=2, filename=None):
 
 	plt.clf()
 

@@ -16,7 +16,7 @@ class PCA:
         self.d, self.N = x.shape
         self.mu = x.mean(axis=-1).reshape(self.d, 1)
 
-    def findPrincipalComponents(self, k=None, threshold=0.90):
+    def find_principal_components(self, k=None, threshold=0.90):
 
         # Normalize x by subtracting average.
         self.x -= self.mu

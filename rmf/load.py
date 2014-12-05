@@ -28,14 +28,14 @@ class Faces:
 
                 self.filelist.append(f)
 
-    def setParams(self, seed=None, train=0.5, valid=0.25):
+    def set_params(self, seed=None, train=0.5, valid=0.25):
         """Set parameters for generating data matrices."""
 
         random.seed(seed)
         self.trr = train
         self.var = valid
 
-    def getLabels(self, delimiter='_'):
+    def get_labels(self, delimiter='_'):
         """ Create labels from the filename given the delimiter."""
 
         self.labels = []
@@ -48,12 +48,12 @@ class Faces:
         for i in range(self.nlabels):
 
             unique = set([label[i] for label in self.labels])
-            print "ID = {0}: ".format(i), unique
+            print "id = {0}: ".format(i), unique
 
-    def getData(self, ID=0, exclude={0: None}):
-        """Given the ID of label organizes data accordingly."""
+    def get_data(self, id=0, exclude={0: None}):
+        """Given the id of label organizes data accordingly."""
 
-        self.ID = ID
+        self.id = id
         self.exclude = exclude
 
         self.datalist = self.filelist[:]
@@ -78,9 +78,9 @@ class Faces:
 
         self.fileload = [os.path.join(self.path, f) for f in
                          self.datalist]
-        self.y = [label[self.ID] for label in self.labellist]
+        self.y = [label[self.id] for label in self.labellist]
 
-    def loadMatrix(self, filelist):
+    def load_matrix(self, filelist):
         """Load the images into a matrix given filelist."""
 
         for i, f in enumerate(filelist):
@@ -103,7 +103,7 @@ class Faces:
 
         return X
 
-    def createMatrices(self):
+    def create_matrices(self):
         """Randomize and divide data into sets and load into matrices."""
 
         randomizedlist = zip(self.fileload, self.y)
@@ -113,17 +113,17 @@ class Faces:
         ntrain = int(self.trr * nelements)
         nvalid = int(self.var * nelements) + ntrain
 
-        trainfilelist, YTrain = zip(*randomizedlist[:ntrain])
-        validfilelist, YValid = zip(*randomizedlist[ntrain:nvalid])
-        testfilelist, YTest = zip(*randomizedlist[nvalid:])
+        trainfilelist, ytrain = zip(*randomizedlist[:ntrain])
+        validfilelist, yvalid = zip(*randomizedlist[ntrain:nvalid])
+        testfilelist, ytest = zip(*randomizedlist[nvalid:])
 
-        self.XTrain = self.loadMatrix(trainfilelist)
-        self.XValid = self.loadMatrix(validfilelist)
-        self.XTest = self.loadMatrix(testfilelist)
+        self.xtrain = self.load_matrix(trainfilelist)
+        self.xvalid = self.load_matrix(validfilelist)
+        self.xtest = self.load_matrix(testfilelist)
 
-        self.YTrain = list(YTrain)
-        self.YValid = list(YValid)
-        self.YTest = list(YTest)
+        self.ytrain = list(ytrain)
+        self.yvalid = list(yvalid)
+        self.ytest = list(ytest)
 
 
 def readPGM(filename):
@@ -145,16 +145,16 @@ def readPGM(filename):
     """
 
     f = open(filename)
-    pgmID = f.readline()  # This is PGM identifier.
+    pgmid = f.readline()  # This is PGM identifier.
 
-    if pgmID[:2] == 'P2':
+    if pgmid[:2] == 'P2':
 
         image = decodeP2(f)
         f.close()
 
         return image
 
-    elif pgmID[:2] == 'P5':
+    elif pgmid[:2] == 'P5':
 
         f.close()
         image = decodeP5(filename)
