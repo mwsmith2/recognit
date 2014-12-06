@@ -1,4 +1,4 @@
-RecognizeMyFace
+Recognit
 ===
 
 Dependencies
