@@ -6,10 +6,10 @@ import numpy as np
 from collections import defaultdict
 from scipy.spatial.distance import cdist
 
-from rmf import load
-from rmf import pca
-from rmf import predict
-from rmf import visual as vis
+from recognit import load
+from recognit import pca
+from recognit import predict
+from recognit import visual as vis
 
 base = os.path.dirname(__file__)
 path = os.path.realpath(base + '/../data/faces')

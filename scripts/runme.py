@@ -1,6 +1,6 @@
 import os
 import numpy as np
-from rmf import *
+from recognit import *
 
 base = os.path.dirname(__file__)
 path = os.path.realpath(base + '/../data/faces')
