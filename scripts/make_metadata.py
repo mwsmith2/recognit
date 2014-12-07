@@ -14,7 +14,7 @@ traits = ['name', 'orientation', 'mood', 'eyewear']
 
 # First large images
 dataset = 'cmu_faces_large'
-images = glob.glob('*_4' + img_ext)
+images = glob.glob('*_0' + img_ext)
 
 for image in images:
 
@@ -30,7 +30,7 @@ for image in images:
 	metadata[image] = data
 
 # Now medium
-dataset = 'cmu_faces_large'
+dataset = 'cmu_faces_medium'
 images = glob.glob('*_2' + img_ext)
 
 for image in images:
@@ -46,8 +46,8 @@ for image in images:
 
 	metadata[image] = data
 
-dataset = 'cmu_faces_large'
-images = glob.glob('*_0' + img_ext)
+dataset = 'cmu_faces_small'
+images = glob.glob('*_4' + img_ext)
 
 for image in images:
 
