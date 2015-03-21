@@ -8,6 +8,8 @@ from scipy.linalg import eig, norm
 
 
 class PCA(object):
+    """Class that handles dimensionality reduction via princinpal 
+    component anlysis."""
 
     def __init__(self, x):
 
@@ -17,6 +19,27 @@ class PCA(object):
         self.mu = x.mean(axis=-1).reshape(self.d, 1)
 
     def find_principal_components(self, k=None, threshold=0.90):
+        """Finds the principal components of the given data set.
+
+        Parameters
+        ----------
+
+        k : integer
+            
+            Forces the number of relevant principal components to be k"
+
+        threshold : float
+
+            Gives a reference point for determining the number of 
+            relevant principal components.  That number being the total
+            number of components needed to explain 'threshold' of 
+            of the total variance.
+
+        Returns
+        -------
+        None
+
+        """
 
         # Normalize x by subtracting average.
         self.x -= self.mu
@@ -47,20 +70,45 @@ class PCA(object):
 
             eigvec[:, i] = eigvec[:, i] / norm(eigvec[:, i])
 
-        # Return only the mo=st significant k eigenvectors.
+        # Store only the most significant k eigenvectors.
         self.eigvec = eigvec[:, :self.k]
         self.eigval = eigval[:self.k]
 
     def project(self, s):
+        """Decomposes the matrix 's' into weights of the relevant
+        principal components.
+
+        Parameters
+        ----------
+        s : array-like
+
+            The image to be decomposed.
+
+        Returns
+        -------
+        None
+
+        """
 
         # Check shape and reshape if necessary.
-        if len(s.shape) == 1:
+        if s.shape != self.mu.shape:
 
-            s = s.reshape(len(s), 1)
+            s = s.reshape(self.mu.shape)
 
         # Project s onto eigenvectors.
         return np.dot(self.eigvec.T, s - self.mu)
 
     def transform(self):
+        """Projects all data into the reduced dimensionality space.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        None
+
+        """
 
         self.xtransform = np.dot(self.eigvec.T, self.x)
