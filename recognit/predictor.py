@@ -19,15 +19,25 @@ class Predictor(object):
         self.k = None
         self.threshold = 0.90
 
-    def set_data(self, s):
-
-        # Load the data for label prediction.
-        self.s = s.T
-
     def train(self, x=None, y=None):
         """Train the dataset with the given labels and clf,
         if no data is given use the last dataset and return classification
         results.
+
+        Parameters
+        ----------
+        x : array, shape(n_features, n_samples)
+
+            the training data, flattened images
+
+        y : array, shape(n_samples)
+
+            the training labels, some trait, i.e. 'name', 'orientation', etc.
+
+        Returns
+        -------
+        None
+
         """
         refit = False
 
@@ -56,12 +66,44 @@ class Predictor(object):
         self.clf.fit(self.x, self.y)
 
     def predict(self, x):
-        """Predict classifier for the given dataset."""
+        """Predict classifier for the given dataset.
+
+        Parameters
+        ----------
+        x : array, shape(n_features, n_samples)
+
+            the test data, flattened images
+
+        Returns
+        -------
+        ypredict : array, shape(n_samples)
+
+            the predicted labels for some trait
+
+        """
         x = self.dimred.transform(x)
         return self.clf.predict(x)
 
     def test(self, xtest, ytest):
-        """Test the fidelity of predictions made by the training set."""
+        """Test the fidelity of predictions made by the training set.
+
+        Parameters
+        ----------
+        x : array, shape(n_features, n_samples)
+
+            the test data, flattened images
+
+        y : array, shape(n_samples)
+
+            the test labels for some trait
+
+        Returns
+        -------
+        success_rate : float
+
+            fraction of successful predictions in test labels
+
+        """
         xtest = self.dimred.transform(xtest)
         ypredict = self.clf.predict(xtest)
 
