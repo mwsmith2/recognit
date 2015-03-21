@@ -2,13 +2,14 @@
 
 __author__ = "Durmus U. Karatay, Matthias W. Smith"
 __email__ = "ukaratay@uw.edu, mwsmith2@uw.edu"
+__status__ = 'Development'
 
 import numpy as np
 from scipy.linalg import eig, norm
 
 
 class PCA(object):
-    """Class that handles dimensionality reduction via princinpal 
+    """Class that handles dimensionality reduction via princinpal
     component anlysis."""
 
     def __init__(self, x):
@@ -25,14 +26,14 @@ class PCA(object):
         ----------
 
         k : integer
-            
+
             Forces the number of relevant principal components to be k"
 
         threshold : float
 
-            Gives a reference point for determining the number of 
+            Gives a reference point for determining the number of
             relevant principal components.  That number being the total
-            number of components needed to explain 'threshold' of 
+            number of components needed to explain 'threshold' of
             of the total variance.
 
         Returns
@@ -74,7 +75,7 @@ class PCA(object):
         self.eigvec = eigvec[:, :self.k]
         self.eigval = eigval[:self.k]
 
-    def project(self, s):
+    def transform(self, s=None):
         """Decomposes the matrix 's' into weights of the relevant
         principal components.
 
@@ -86,29 +87,19 @@ class PCA(object):
 
         Returns
         -------
-        None
+        Transformed vector s, or transformed training data x.
 
         """
 
-        # Check shape and reshape if necessary.
-        if s.shape != self.mu.shape:
+        if s is None:
+            self.xtransform = np.dot(self.eigvec.T, self.x)
+            return self.xtransform
 
-            s = s.reshape(self.mu.shape)
+        else:
 
-        # Project s onto eigenvectors.
-        return np.dot(self.eigvec.T, s - self.mu)
+            # Check shape and reshape if necessary.
+            if s.shape != self.mu.shape:
+                s = s.reshape(self.mu.shape)
 
-    def transform(self):
-        """Projects all data into the reduced dimensionality space.
-
-        Parameters
-        ----------
-        None
-
-        Returns
-        -------
-        None
-
-        """
-
-        self.xtransform = np.dot(self.eigvec.T, self.x)
+            # Project s onto eigenvectors.
+            return np.dot(self.eigvec.T, s - self.mu)
