@@ -10,7 +10,7 @@ base = os.path.dirname(__file__)
 path = os.path.realpath(base + '/../data')
 
 # Load faces from the path.
-faces = load.Faces(path, 'pgm')
+faces = load.Faces(path, 'jpeg')
 faces.set_params(seed=895, train=0.60, valid=0.15)
 faces.get_labels()
 

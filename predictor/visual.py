@@ -12,17 +12,17 @@ def create_font(fontname='Tahoma', fontsize=10):
 
 	Parameters
 	----------
-	string : fontname
+	fontname : string
 
 		The desired font, i.e., Times New Roman, Verdana, etc.
 
-	int: fontsize
+	fontsize : integer
 
 		The fontsize used for display on the figure.
 
 	Returns
 	-------
-	dictionary-like : matplotlib 
+	mpl_font : dictionary
 
 		A font dictionary used by matplotlib figures.
 
@@ -37,41 +37,40 @@ def plot_faces(title, images, rows=3, cols=6, sptitle="subplot", sptitles=[], co
 	Parameters
 	----------
 
-	string : title
+	title : string
 
 		Title for the whole set of plots.
 
-	array-like: images
+	images : array-like
 
 		The set of images to be plotted.
 
-	int : rows
+	rows : integer
 
 		Number of rows in face image grid.
 
-	int : cols
+	cols : integer
 
 		Number of columns in the face image grid.
 
-	string : sptitle
+	sptitle : string
 
 		The title to be numbered and used on each subplot.
 
-	list of strings : sptitles
+	sptitles : list of strings
 
 		A set of different titles to be called for each sequential subplot.
 
-	matplotlib cm : colormap
+	colormap : matplotlib cm
 
 		The color gradient that represents intensity on the figure.
 
-	string : filename
+	filename : string
 
 		Output filename to save the image to disk.
 
 	Returns
 	-------
-
 	None
 
 	"""
@@ -102,6 +101,31 @@ def plot_faces(title, images, rows=3, cols=6, sptitle="subplot", sptitles=[], co
 	plt.close()
 
 def normalize(a, lo, hi):
+	"""Maps an array linear into a new range.
+
+	Parameters
+	----------
+
+	a : array-like
+
+		The data to be adjusted
+
+	lo : float
+
+		The lowest desired value
+
+	hi : float
+
+		The highest desired value
+
+	Returns
+	-------
+
+	a : array-like
+
+		The remapped input array.
+
+	"""
 
 	amin = np.min(a)
 	amax = np.max(a)
@@ -112,6 +136,36 @@ def normalize(a, lo, hi):
 	return a
 
 def scatter_face(title, faceweights, x1=1, x2=2, filename=None):
+	"""Create a nice plot meant to show clustering in the PCA weights.
+
+	Parameters
+	----------
+
+	title : string
+
+		The title of the plot
+
+	faceweights : array-like 
+
+		The projected data going into the plot.
+
+	x1 : integer
+
+		The principal component index on the x-axis
+
+	x2 : integer
+
+		The principal component index on the y-axis
+
+	filename : string
+
+		If given, the plot will be saved as this file.
+
+	Returns
+	-------
+	None
+
+	"""
 
 	plt.clf()
 

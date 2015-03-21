@@ -4,9 +4,9 @@ create datasets."""
 __author__ = "Durmus U. Karatay, Matthias W. Smith"
 __email__ = "ukaratay@uw.edu, mwsmith2@uw.edu"
 
-import numpy as np
 import os
 import random
+import numpy as np
 from matplotlib.image import imread
 
 

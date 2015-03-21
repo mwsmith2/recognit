@@ -6,11 +6,10 @@ for the data_set."""
 import json
 import glob
 
-img_ext = '.pgm'
-
+img_ext = '.jpeg'
+traits = ['name', 'orientation', 'mood', 'eyewear']
 
 metadata = {}
-traits = ['name', 'orientation', 'mood', 'eyewear']
 
 # First large images
 dataset = 'cmu_faces_large'
