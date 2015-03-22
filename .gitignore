@@ -55,8 +55,10 @@ docs/_build/
 
 # PyBuilder
 target/
+
 =======
 data
+faces/Thumbs.db
 fig
 *.pyc
 *sublime*
