@@ -6,7 +6,7 @@ for the data_set."""
 import json
 import glob
 
-img_ext = '.jpeg'
+img_ext = '.jpg'
 traits = ['name', 'orientation', 'mood', 'eyewear']
 
 metadata = {}
@@ -17,16 +17,16 @@ images = glob.glob('*_0' + img_ext)
 
 for image in images:
 
-	data = {}
-	labels = image.split('.')[0].split('_')
-	data['dataset'] = dataset
-	data['labels'] = {}
+    data = {}
+    labels = image.split('.')[0].split('_')
+    data['library'] = dataset
+    data['labels'] = {}
 
-	for trait, label in zip(traits, labels):
+    for trait, label in zip(traits, labels):
 
-		data['labels'][trait] = label
+        data['labels'][trait] = label
 
-	metadata[image] = data
+    metadata[image] = data
 
 # Now medium
 dataset = 'cmu_faces_medium'
@@ -34,37 +34,36 @@ images = glob.glob('*_2' + img_ext)
 
 for image in images:
 
-	data = {}
-	labels = image.split('.')[0].split('_')
-	data['dataset'] = dataset
-	data['labels'] = {}
+    data = {}
+    labels = image.split('.')[0].split('_')
+    data['library'] = dataset
+    data['labels'] = {}
 
-	for trait, label in zip(traits, labels):
+    for trait, label in zip(traits, labels):
 
-		data['labels'][trait] = label
+        data['labels'][trait] = label
 
-	metadata[image] = data
+    metadata[image] = data
 
 dataset = 'cmu_faces_small'
 images = glob.glob('*_4' + img_ext)
 
 for image in images:
 
-	data = {}
-	labels = image.split('.')[0].split('_')
-	data['dataset'] = dataset
-	data['labels'] = {}
+    data = {}
+    labels = image.split('.')[0].split('_')
+    data['library'] = dataset
+    data['labels'] = {}
 
-	for trait, label in zip(traits, labels):
+    for trait, label in zip(traits, labels):
 
-		data['labels'][trait] = label
+        data['labels'][trait] = label
 
-	metadata[image] = data
+    metadata[image] = data
 
 # Write the json file
 metafile = open('metadata.json', 'w')
-metafile.write(json.dumps(metadata, 
-						  sort_keys=True, 
-						  separators=[',', ':'], 
-						  indent=4))
-
+metafile.write(json.dumps(metadata,
+                          sort_keys=True,
+                          separators=[',', ':'],
+                          indent=4))
