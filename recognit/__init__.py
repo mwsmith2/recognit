@@ -1,1 +1,1 @@
-__all__ = ["load", "pca", "predict", "visual"]
+__all__ = ['dataset', 'predictor', 'visual']

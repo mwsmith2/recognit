@@ -7,9 +7,9 @@ import numpy as np
 from PIL import Image
 
 __author__ = "Durmus U. Karatay, Matthias W. Smith"
-__email__ = "ukaratay@uw.edu, mwsmith2@uw.edu"
+__email__ = "ukaratay@gmail.com, mwsmith2112@gmail.com"
 __maintainer__ = "Durmus U. Karatay"
-__status__ = "Development"
+__status__ = "Production"
 
 
 class Dataset(object):
