@@ -1,20 +1,27 @@
 """dataset.py: Contains a class to create datasets."""
 
-__author__ = "Durmus U. Karatay, Matthias W. Smith"
-__email__ = "ukaratay@uw.edu, mwsmith2@uw.edu"
-__maintainer__ = "Durmus U. Karatay"
-__status__ = "Development"
-
 import os
 import json
 import random
 import numpy as np
 from PIL import Image
 
+__author__ = "Durmus U. Karatay, Matthias W. Smith"
+__email__ = "ukaratay@uw.edu, mwsmith2@uw.edu"
+__maintainer__ = "Durmus U. Karatay"
+__status__ = "Development"
+
+
 class Dataset(object):
     """
     Creates a dataset from a given path that contains images and image metadata
     in JSON format.
+
+    If images are different sizes, it resizes all of them to the biggest size
+    in the dataset.
+
+    Test set is created from what is left after creating training and
+    validation datasets.
 
     Parameters
     ----------
@@ -29,7 +36,38 @@ class Dataset(object):
 
     Attributes
     ----------
+    label : string
+        Label for y values of dataset, gets its data from label property in
+        metadata file.
 
+    library : string
+        Library for the dataset if there is more than one libraries included
+        in the metadata file, get its data from library property in metadata
+        file.
+
+    Properties
+    ----------
+    seed : integer
+        Seed for random shuffling the dataset. It can be set to same number for
+        repeatability.
+
+    xtrain : array_like (n_samples, n_features)
+        Training images flattened into an array-like structure.
+
+    xvalid : array_like (n_samples, n_features)
+        Validation images flattened into an array-like structure.
+
+    xtest : array_like (n_samples, n_features)
+        Test images flattened into an array-like structure.
+
+    ytrain : array_like (n_samples, )
+        Training labels in an array-like structure.
+
+    xvalid : array_like (n_samples, )
+        Validation labels in an array-like structure.
+
+    xtest : array_like (n_samples, )
+        Test labels in an array-like structure.
 
     """
 
@@ -41,19 +79,19 @@ class Dataset(object):
         self.validation_ratio = validation
         self.test_ratio = 1 - training - validation
 
-        self.label = None
-        self.library = None
+        self.label = ''
+        self.library = ''
 
         # Set the properties.
         self._seed = 1234
 
         # Initialize the outputs.
-        self._xtrain = None
-        self._ytrain = None
-        self._xvalid = None
-        self._yvalid = None
-        self._xtest = None
-        self._ytest = None
+        self._xtrain = np.array([])
+        self._ytrain = np.array([])
+        self._xvalid = np.array([])
+        self._yvalid = np.array([])
+        self._xtest = np.array([])
+        self._ytest = np.array([])
 
         # Check if ratios are correct.
         if self.test_ratio < 0:
@@ -91,16 +129,27 @@ class Dataset(object):
 
             raise IOError('No JSON file found!')
 
+        return
+
     @property
     def seed(self):
         """Seed for randomization"""
 
         return self._seed
 
+    @seed.setter
+    def set_seed(self, value):
+        """Setter for seed."""
+
+        self._seed = value
+
+        return
+
     @property
     def xtrain(self):
+        """Training images flattened into an array-like structure."""
 
-        if not self._xtrain:
+        if not len(self._xtrain):
 
             raise AttributeError('Training dataset is not created yet!')
 
@@ -110,8 +159,9 @@ class Dataset(object):
 
     @property
     def ytrain(self):
+        """Training labels in an array-like structure."""
 
-        if not self._ytrain:
+        if not len(self._ytrain):
 
             raise AttributeError('Training dataset is not created yet!')
 
@@ -121,8 +171,9 @@ class Dataset(object):
 
     @property
     def xvalid(self):
+        """Validation images flattened into an array-like structure."""
 
-        if not self._xvalid:
+        if not len(self._xvalid):
 
             if self.validation_ratio == 0:
 
@@ -138,8 +189,9 @@ class Dataset(object):
 
     @property
     def yvalid(self):
+        """Validation labels in an array-like structure."""
 
-        if not self._yvalid:
+        if not len(self._yvalid):
 
             if self.validation_ratio == 0:
 
@@ -155,8 +207,9 @@ class Dataset(object):
 
     @property
     def xtest(self):
+        """Test images flattened into an array-like structure."""
 
-        if not self._xtest:
+        if not len(self._xtest):
 
             if self.test_ratio == 0:
 
@@ -168,12 +221,13 @@ class Dataset(object):
 
         else:
 
-            return self._xest
+            return self._xtest
 
     @property
     def ytest(self):
+        """Test labels in an array-like structure."""
 
-        if not self._ytest:
+        if not len(self._ytest):
 
             if self.test_ratio == 0:
 
@@ -187,13 +241,7 @@ class Dataset(object):
 
             return self._ytest
 
-    @seed.setter
-    def set_seed(self, value):
-        """Setter for seed."""
-
-        self._seed = value
-
-    def create(self, label, library):
+    def create(self, label, library=None):
         """Create datasets for given label and library."""
 
         # Set label and library.
@@ -204,15 +252,16 @@ class Dataset(object):
         if library:
 
             image_dict = {key: value for key, value in self.metadata.items()
-                          if value['dataset'] == self.library}
+                          if value['library'] == self.library}
 
         else:
 
             image_dict = self.metadata
 
-        # Initialize lists.
+        # Initialize variables.
         labels = []
         images = []
+        size = (0, 0)
 
         # Set the seed for randomization and shuffle the dataset.
         random.seed(self.seed)
@@ -221,20 +270,29 @@ class Dataset(object):
         # Iterate over images and load them.
         for key, value in iterable:
 
-            im_file = os.path.join(self.path, key)
-            im = Image.open(im_file).convert('L')
+            img_file = os.path.join(self.path, key)
+            img = Image.open(img_file).convert('L')
 
-            images.append(np.asarray(im, dtype=np.float_).flatten())
+            size = max(size, img.size)
+
+            images.append(img)
             labels.append(value['labels'][self.label])
 
-        x = np.array(images)
-        y = np.array(labels)
+        xset = np.empty((len(images), size[0] * size[1]))
 
-        idx_train = int(len(images) * self.training_ratio)
+        for i, img in enumerate(images):
+
+            img = img.resize(size)
+            xset[i, :] = np.asarray(img, dtype=np.float).flatten()
+
+        yset = np.array(labels, ndmin=1)
+
+        idx_train = int(len(images) * self.training_ratio) + 1
         idx_valid = idx_train + int(len(images) * self.validation_ratio)
 
-        self._xtrain, rest = np.hsplit(x, idx_train)
-        self._xvalid, self._xtest = np.hsplit(rest, idx_valid)
+        idx = [idx_train, idx_valid]
 
-        self._ytrain, rest = np.hsplit(y, idx_train)
-        self._yvalid, self._ytest = np.hsplit(rest, idx_valid)
+        self._xtrain, self._xvalid, self._xtest = np.vsplit(xset, idx)
+        self._ytrain, self._yvalid, self._ytest = np.split(yset, idx)
+
+        return
