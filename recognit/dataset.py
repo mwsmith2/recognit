@@ -278,8 +278,10 @@ class Dataset(object):
             images.append(img)
             labels.append(value['labels'][self.label])
 
+        # Initialize the numpy array.
         xset = np.empty((len(images), size[0] * size[1]))
 
+        # Iterate over images and resize them, then add them to the array.
         for i, img in enumerate(images):
 
             img = img.resize(size)
@@ -287,11 +289,13 @@ class Dataset(object):
 
         yset = np.array(labels, ndmin=1)
 
+        # Calculate where splits are going to happen.
         idx_train = int(len(images) * self.training_ratio) + 1
         idx_valid = idx_train + int(len(images) * self.validation_ratio)
 
         idx = [idx_train, idx_valid]
 
+        # Split arrays into datasets.
         self._xtrain, self._xvalid, self._xtest = np.vsplit(xset, idx)
         self._ytrain, self._yvalid, self._ytest = np.split(yset, idx)
 
